@@ -13,6 +13,8 @@ from typing import Optional
 
 from models.person import PersonCreate, PersonRead, PersonUpdate
 from models.address import AddressCreate, AddressRead, AddressUpdate
+from models.course import CourseCreate, CourseRead, CourseUpdate
+from models.assignment import AssignmentCreate, AssignmentRead, AssignmentUpdate
 from models.health import Health
 
 port = int(os.environ.get("FASTAPIPORT", 8000))
@@ -22,15 +24,17 @@ port = int(os.environ.get("FASTAPIPORT", 8000))
 # -----------------------------------------------------------------------------
 persons: Dict[UUID, PersonRead] = {}
 addresses: Dict[UUID, AddressRead] = {}
+courses: Dict[UUID, CourseRead] = {}
+assignments: Dict[UUID, AssignmentRead] = {}
 
 app = FastAPI(
-    title="Person/Address API",
-    description="Demo FastAPI app using Pydantic v2 models for Person and Address",
+    title="Person/Address/Course/Assignment API",
+    description="Demo FastAPI app using Pydantic v2 models for Person, Address, Course, and Assignment",
     version="0.1.0",
 )
 
 # -----------------------------------------------------------------------------
-# Address endpoints
+# Health endpoints
 # -----------------------------------------------------------------------------
 
 def make_health(echo: Optional[str], path_echo: Optional[str]=None) -> Health:
@@ -54,6 +58,10 @@ def get_health_with_path(
     echo: str | None = Query(None, description="Optional echo string"),
 ):
     return make_health(echo=echo, path_echo=path_echo)
+
+# -----------------------------------------------------------------------------
+# Address endpoints
+# -----------------------------------------------------------------------------
 
 @app.post("/addresses", response_model=AddressRead, status_code=201)
 def create_address(address: AddressCreate):
@@ -103,6 +111,7 @@ def update_address(address_id: UUID, update: AddressUpdate):
 # -----------------------------------------------------------------------------
 # Person endpoints
 # -----------------------------------------------------------------------------
+
 @app.post("/persons", response_model=PersonRead, status_code=201)
 def create_person(person: PersonCreate):
     # Each person gets its own UUID; stored as PersonRead
@@ -160,15 +169,113 @@ def update_person(person_id: UUID, update: PersonUpdate):
     return persons[person_id]
 
 # -----------------------------------------------------------------------------
+# Course endpoints
+# -----------------------------------------------------------------------------
+
+@app.post("/courses", response_model=CourseRead, status_code=201)
+def create_course(course: CourseCreate):
+    course_read = CourseRead(**course.model_dump())
+    courses[course_read.id] = course_read
+    return course_read
+
+@app.get("/courses", response_model=List[CourseRead])
+def list_courses(
+    course_code: Optional[str] = Query(None, description="Filter by course code"),
+    title: Optional[str] = Query(None, description="Filter by course title"),
+    instructor: Optional[str] = Query(None, description="Filter by instructor"),
+    credits: Optional[int] = Query(None, description="Filter by number of credits"),
+    semester: Optional[str] = Query(None, description="Filter by semester"),
+):
+    results = list(courses.values())
+
+    if course_code is not None:
+        results = [c for c in results if c.course_code == course_code]
+    if title is not None:
+        results = [c for c in results if c.title == title]
+    if instructor is not None:
+        results = [c for c in results if c.instructor == instructor]
+    if credits is not None:
+        results = [c for c in results if c.credits == credits]
+    if semester is not None:
+        results = [c for c in results if c.semester == semester]
+
+    return results
+
+@app.get("/courses/{course_id}", response_model=CourseRead)
+def get_course(course_id: UUID):
+    if course_id not in courses:
+        raise HTTPException(status_code=404, detail="Course not found")
+    return courses[course_id]
+
+@app.patch("/courses/{course_id}", response_model=CourseRead)
+def update_course(course_id: UUID, update: CourseUpdate):
+    if course_id not in courses:
+        raise HTTPException(status_code=404, detail="Course not found")
+    stored = courses[course_id].model_dump()
+    stored.update(update.model_dump(exclude_unset=True))
+    courses[course_id] = CourseRead(**stored)
+    return courses[course_id]
+
+# -----------------------------------------------------------------------------
+# Assignment endpoints
+# -----------------------------------------------------------------------------
+
+@app.post("/assignments", response_model=AssignmentRead, status_code=201)
+def create_assignment(assignment: AssignmentCreate):
+    assignment_read = AssignmentRead(**assignment.model_dump())
+    assignments[assignment_read.id] = assignment_read
+    return assignment_read
+
+@app.get("/assignments", response_model=List[AssignmentRead])
+def list_assignments(
+    title: Optional[str] = Query(None, description="Filter by assignment title"),
+    assignment_type: Optional[str] = Query(None, description="Filter by assignment type"),
+    course_id: Optional[UUID] = Query(None, description="Filter by course ID"),
+    due_date: Optional[str] = Query(None, description="Filter by due date (YYYY-MM-DD)"),
+    assigned_date: Optional[str] = Query(None, description="Filter by assigned date (YYYY-MM-DD)"),
+):
+    results = list(assignments.values())
+
+    if title is not None:
+        results = [a for a in results if a.title == title]
+    if assignment_type is not None:
+        results = [a for a in results if a.assignment_type == assignment_type]
+    if course_id is not None:
+        results = [a for a in results if a.course_id == course_id]
+    if due_date is not None:
+        results = [a for a in results if str(a.due_date) == due_date]
+    if assigned_date is not None:
+        results = [a for a in results if str(a.assigned_date) == assigned_date]
+
+    return results
+
+@app.get("/assignments/{assignment_id}", response_model=AssignmentRead)
+def get_assignment(assignment_id: UUID):
+    if assignment_id not in assignments:
+        raise HTTPException(status_code=404, detail="Assignment not found")
+    return assignments[assignment_id]
+
+@app.patch("/assignments/{assignment_id}", response_model=AssignmentRead)
+def update_assignment(assignment_id: UUID, update: AssignmentUpdate):
+    if assignment_id not in assignments:
+        raise HTTPException(status_code=404, detail="Assignment not found")
+    stored = assignments[assignment_id].model_dump()
+    stored.update(update.model_dump(exclude_unset=True))
+    assignments[assignment_id] = AssignmentRead(**stored)
+    return assignments[assignment_id]
+
+# -----------------------------------------------------------------------------
 # Root
 # -----------------------------------------------------------------------------
+
 @app.get("/")
 def root():
-    return {"message": "Welcome to the Person/Address API. See /docs for OpenAPI UI."}
+    return {"message": "Welcome to the Person/Address/Course/Assignment API. See /docs for OpenAPI UI."}
 
 # -----------------------------------------------------------------------------
 # Entrypoint for `python main.py`
 # -----------------------------------------------------------------------------
+
 if __name__ == "__main__":
     import uvicorn
 

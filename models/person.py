@@ -73,7 +73,7 @@ class PersonBase(BaseModel):
                     "birth_date": "1815-12-10",
                     "addresses": [
                         {
-                            "id": "550e8400-e29b-41d4-a716-446655440000",
+                            "id": "550",
                             "street": "123 Main St",
                             "city": "London",
                             "state": None,
@@ -96,12 +96,12 @@ class PersonCreate(PersonBase):
                     "uni": "xy123",
                     "first_name": "Grace",
                     "last_name": "Hopper",
-                    "email": "grace.hopper@navy.mil",
+                    "email": "grace.hopper@columbia.edu",
                     "phone": "+1-202-555-0101",
-                    "birth_date": "1906-12-09",
+                    "birth_date": "1996-12-09",
                     "addresses": [
                         {
-                            "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                            "id": "aaaaaaaa",
                             "street": "1701 E St NW",
                             "city": "Washington",
                             "state": "DC",
