@@ -108,6 +108,12 @@ def update_address(address_id: UUID, update: AddressUpdate):
     addresses[address_id] = AddressRead(**stored)
     return addresses[address_id]
 
+@app.delete("/addresses/{address_id}", status_code=204)
+def delete_address(address_id: UUID):
+    if address_id not in addresses:
+        raise HTTPException(status_code=404, detail="Address not found")
+    del addresses[address_id]
+
 # -----------------------------------------------------------------------------
 # Person endpoints
 # -----------------------------------------------------------------------------
@@ -215,6 +221,12 @@ def update_course(course_id: UUID, update: CourseUpdate):
     stored.update(update.model_dump(exclude_unset=True))
     courses[course_id] = CourseRead(**stored)
     return courses[course_id]
+
+@app.delete("/courses/{course_id}", status_code=204)
+def delete_course(course_id: UUID):
+    if course_id not in courses:
+        raise HTTPException(status_code=404, detail="Course not found")
+    del courses[course_id]
 
 # -----------------------------------------------------------------------------
 # Assignment endpoints
