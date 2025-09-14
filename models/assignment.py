@@ -50,7 +50,7 @@ class AssignmentBase(BaseModel):
                     "title": "Programming Assignment 1: Web Scraper",
                     "description": "Build a web scraper using Python to collect data from specified websites.",
                     "assignment_type": "homework",
-                    "course_id": "11111111-1111-4111-8111-111111111111",
+                    "course_id": "11111111-1111",
                     "assigned_date": "2025-09-01",
                     "due_date": "2025-09-15",
                     "max_points": 100,
@@ -69,7 +69,7 @@ class AssignmentCreate(AssignmentBase):
                     "title": "Midterm Exam",
                     "description": "Comprehensive exam covering chapters 1-8",
                     "assignment_type": "exam",
-                    "course_id": "11111111-1111-4111-8111-111111111111",
+                    "course_id": "11111111",
                     "assigned_date": "2025-10-01",
                     "due_date": "2025-10-15",
                     "max_points": 200,
@@ -95,7 +95,7 @@ class AssignmentUpdate(BaseModel):
     )
     course_id: Optional[UUID] = Field(
         None,
-        json_schema_extra={"example": "22222222-2222-4222-8222-222222222222"},
+        json_schema_extra={"example": "22222222"},
     )
     assigned_date: Optional[date] = Field(
         None,
@@ -129,7 +129,7 @@ class AssignmentRead(AssignmentBase):
     id: UUID = Field(
         default_factory=uuid4,
         description="Server-generated Assignment ID.",
-        json_schema_extra={"example": "33333333-3333-4333-8333-333333333333"},
+        json_schema_extra={"example": "33333333"},
     )
     created_at: datetime = Field(
         default_factory=datetime.utcnow,
@@ -148,9 +148,9 @@ class AssignmentRead(AssignmentBase):
                 {
                     "id": "33333333-3333-4333-8333-333333333333",
                     "title": "Programming Assignment 1: Web Scraper",
-                    "description": "Build a web scraper using Python to collect data from specified websites.",
+                    "description": "Build a web scraper using Python.",
                     "assignment_type": "homework",
-                    "course_id": "11111111-1111-4111-8111-111111111111",
+                    "course_id": "ABC 123",
                     "assigned_date": "2025-09-01",
                     "due_date": "2025-09-15",
                     "max_points": 100,

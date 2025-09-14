@@ -141,7 +141,7 @@ class CourseRead(CourseBase):
     id: UUID = Field(
         default_factory=uuid4,
         description="Server-generated Course ID.",
-        json_schema_extra={"example": "11111111-1111-4111-8111-111111111111"},
+        json_schema_extra={"example": "11111111"},
     )
     created_at: datetime = Field(
         default_factory=datetime.utcnow,
@@ -158,7 +158,7 @@ class CourseRead(CourseBase):
         "json_schema_extra": {
             "examples": [
                 {
-                    "id": "11111111-1111-4111-8111-111111111111",
+                    "id": "11111111",
                     "course_code": "COMS W4153",
                     "title": "Cloud Computing",
                     "description": "An introduction to cloud computing concepts, architectures, and technologies.",
